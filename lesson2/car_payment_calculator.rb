@@ -25,7 +25,7 @@ loop do
     loan_amount = gets.chomp
 
     if loan_amount.to_f <= 0 || loan_amount.empty?
-      prompt("Invalid input. 0 or negtive numbers not allowed, please enter a valid amount.")
+      prompt("Invalid input. 0 or negtive numbers are not allowed.")
     else
       break
     end
@@ -37,7 +37,7 @@ loop do
     loan_in_years = gets.chomp
 
     if loan_in_years.to_i <= 0 || loan_in_years.empty?
-      prompt("Invalid input. 0 or negtive numbers not allowed, please enter a valid duration.")
+      prompt("Invalid input. 0 or negtive numbers not allowed.")
     else
       break
     end
@@ -67,7 +67,7 @@ loop do
   prompt("Calculating...")
 
   result_prompt = <<-MSG
-
+  Thank you, #{name}!
   - Your monthly interest rate is #{monthly_int_rate.round(4)}.
   - For a period of #{loan_in_months} months.
   - Your monthly payments will be: #{monthly_payments.round(2)}
