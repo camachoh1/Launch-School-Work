@@ -25,7 +25,7 @@ loop do
     loan_amount = gets.chomp
 
     if loan_amount.to_f <= 0 || loan_amount.empty?
-      prompt("Please enter a valid loan amount.")
+      prompt("Invalid input. 0 or negtive numbers not allowed, please enter a valid amount.")
     else
       break
     end
@@ -37,7 +37,7 @@ loop do
     loan_in_years = gets.chomp
 
     if loan_in_years.to_i <= 0 || loan_in_years.empty?
-      prompt("Please enter a valid loan duration")
+      prompt("Invalid input. 0 or negtive numbers not allowed, please enter a valid duration.")
     else
       break
     end
