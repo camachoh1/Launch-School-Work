@@ -196,12 +196,17 @@ loop do
   
   loop do
     board = initialize_board
-    first_move = who_goes_first
+    current_player = who_goes_first
+
       loop do
           display_board(board)
-          
+          if current_player == PLAYER_MARKER
           player_places_piece!(board)
-          break if someone_won?(board) || board_full?(board)
+          current_player == COMPUTER_MARKER
+          else current_player == COMPUTER_MARKER
+            computer_places_piece!(board)
+            current_player == PLAYER_MARKER  
+          break 
 
           computer_places_piece!(board)
           break if someone_won?(board) || board_full?(board) 
