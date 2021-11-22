@@ -201,14 +201,14 @@ loop do
       loop do
           display_board(board)
           if current_player == PLAYER_MARKER
-          player_places_piece!(board)
-          current_player == COMPUTER_MARKER
-          else current_player == COMPUTER_MARKER
+            player_places_piece!(board)
+            current_player == COMPUTER_MARKER
+          elsif current_player == COMPUTER_MARKER
             computer_places_piece!(board)
             current_player == PLAYER_MARKER  
-          break 
+          end  
 
-          computer_places_piece!(board)
+          # computer_places_piece!(board)
           break if someone_won?(board) || board_full?(board) 
       end
     
