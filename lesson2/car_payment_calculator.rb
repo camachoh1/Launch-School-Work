@@ -80,6 +80,7 @@ loop do
   continue = gets.chomp.downcase
 
   break if continue != 'y'
+  system('clear')
 end
 
 prompt("Thanks for using your Car Loan Calculator!")

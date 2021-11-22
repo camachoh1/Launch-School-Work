@@ -1,5 +1,5 @@
 WINNING_MOVES = {
-  'rock' => ['scissors', 'lizzard'],
+  'rock' => ['scissors', 'lizard'],
   'paper' => ['rock', 'spock'],
   'scissors' => ['paper', 'lizard'],
   'lizard' => ['paper', 'spock'],
