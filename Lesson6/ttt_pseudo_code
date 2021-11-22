@@ -1,0 +1,18 @@
+
+
+#TTT
+
+# Display empty 3x3 board.
+# ask the user to mark a square.
+# computer marks a square.
+# Display the updated board state.
+# If winner, display winner.
+# if board is full, display tie.
+# If neither winner nor board is full, go to #2
+# play again?
+# if yes, go to #1
+# good bye
+
+# Here we can see how we can access the initialize_board method in order to display
+# payer or computer positions on the board. 
+# we have interpolated the brd variable calling the keys on the hash that represents the positions and element choices.
