@@ -98,7 +98,7 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-def computer_places_piece!(brd)
+def comp_places_piece!(brd)
   square = nil
 
   # offense
