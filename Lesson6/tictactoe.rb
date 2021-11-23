@@ -124,7 +124,24 @@ def computer_attack(line,brd)
   else 
     nil
   end
-end 
+end
+
+def place_piece!(brd, current_player)
+
+  if current_player == PLAYER_MARKER
+    player_places_piece!(brd)
+  elsif current_player == COMPUTER_MARKER
+    computer_places_piece!(brd) 
+  end
+end
+
+def alternate_player(current_player)
+  if current_player == PLAYER_MARKER
+    current_player = COMPUTER_MARKER
+  else current_player == COMPUTER_MARKER
+      current_player = PLAYER_MARKER
+  end
+end         
 
 def board_full?(brd)
   empty_squares(brd).empty?
@@ -157,7 +174,7 @@ end
 
 def display_winner(win, winner)
   if win
-    prompt "#{winner} won!"
+    prompt "#{winner} wins!"
   else
     prompt "it's a tie!"
   end
@@ -185,7 +202,7 @@ end
 def champion(score)
   if score["Player"] > score["Computer"]
     prompt("Congratulations! You are the ultimate champion!")
-  elsif score["Computer"] < score["Player"]
+  elsif score["Computer"] > score["Player"]
     prompt("The computer is the ultimate champion!")
   end
 end
@@ -200,15 +217,9 @@ loop do
 
       loop do
           display_board(board)
-          if current_player == PLAYER_MARKER
-            player_places_piece!(board)
-            current_player = COMPUTER_MARKER
-          elsif current_player == COMPUTER_MARKER
-            computer_places_piece!(board)
-            current_player = PLAYER_MARKER  
-          end
-                    
-          break if someone_won?(board) || board_full?(board) 
+          place_piece!(board, current_player)
+          current_player = alternate_player(current_player)
+          break if someone_won?(board) || board_full?(board)
       end
     
     display_board(board)
@@ -218,12 +229,9 @@ loop do
     prompt("Press enter to continue")
     gets.chomp   
     
-    if finished?(score)
-      champion(score)
-      break 
-    end    
+    break if finished?(score) 
   end
-        
+  champion(score)       
   prompt "Play again? (y or n)"
   answer = gets.chomp
   break if answer.downcase.start_with?('n') 
