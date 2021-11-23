@@ -185,8 +185,9 @@ def champion(score)
   else score["Computer"] > score["Player"]
       prompt "The Computer is the champion!"
   end
-end     
+end
 
+# Main game loop starts
 loop do 
   score = {"Player" => 0, "Computer" => 0}
 
