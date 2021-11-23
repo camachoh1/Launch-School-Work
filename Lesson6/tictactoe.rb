@@ -75,7 +75,7 @@ def place_piece!(brd, current_player)
   if current_player == PLAYER_MARKER
     player_places_piece!(brd)
   elsif current_player == COMPUTER_MARKER
-    computer_places_piece!(brd)
+    comp_places_piece!(brd)
   end
 end
 
