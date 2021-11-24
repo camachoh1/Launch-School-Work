@@ -185,11 +185,20 @@ def champion(score)
   end
 end
 
+system 'clear'
+prompt "Welcome to tic-tac-toe!"
+prompt "Press enter to start playing."
+gets.chomp
+system 'clear'
+prompt "Loading..."
+sleep(2)
+
 # Main game loop starts
 loop do
   score = { 'Player' => 0, 'Computer' => 0 }
 
   loop do
+    system 'clear'
     board = initialize_board
     current_player = who_goes_first?
 
