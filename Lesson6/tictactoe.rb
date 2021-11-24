@@ -1,5 +1,3 @@
-require 'pry'
-
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
@@ -114,7 +112,7 @@ def comp_turn!(brd)
     end
   end
 
-  if !square && empty_squares.include?(CENTER_SQUARE)
+  if !square && empty_squares(brd).include?(CENTER_SQUARE)
     square = CENTER_SQUARE
   end
 
