@@ -8,6 +8,7 @@ WINNING_LINES =
   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
   [[1, 5, 9], [3, 5, 7]]
 WINNING_SCORE = 5
+CENTER_SQUARE = 5
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -73,9 +74,9 @@ end
 
 def place_piece!(brd, current_player)
   if current_player == PLAYER_MARKER
-    player_places_piece!(brd)
+    player_turn!(brd)
   elsif current_player == COMPUTER_MARKER
-    comp_places_piece!(brd)
+    comp_turn!(brd)
   end
 end
 
@@ -87,7 +88,7 @@ def alternate_player(current_player)
   end
 end
 
-def player_places_piece!(brd)
+def player_turn!(brd)
   square = ''
   loop do
     prompt "Choose a square (#{joinor(empty_squares(brd))}):"
@@ -98,29 +99,29 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-def comp_places_piece!(brd)
+def comp_turn!(brd)
   square = nil
 
-  # offense
   WINNING_LINES.each do |line|
     square = computer_attack_defense(line, brd, COMPUTER_MARKER)
     break if square
   end
-  # defense
+
   if !square
     WINNING_LINES.each do |line|
       square = computer_attack_defense(line, brd, PLAYER_MARKER)
       break if square
     end
   end
-  # center square
-  if !square && empty_squares(brd).include?(5)
-    square = 5
+
+  if !square && empty_squares.include?(CENTER_SQUARE)
+    square = CENTER_SQUARE
   end
-  # random square
+
   if !square
     square = empty_squares(brd).sample
   end
+
   brd[square] = COMPUTER_MARKER
 end
 
