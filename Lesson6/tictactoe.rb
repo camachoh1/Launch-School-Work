@@ -1,3 +1,4 @@
+
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
@@ -7,9 +8,29 @@ WINNING_LINES =
   [[1, 5, 9], [3, 5, 7]]
 WINNING_SCORE = 5
 CENTER_SQUARE = 5
+MARKER_MAP = {
+  'p' => PLAYER_MARKER,
+  'c' => COMPUTER_MARKER,
+  'r' => [PLAYER_MARKER, COMPUTER_MARKER].sample
+}
 
 def prompt(msg)
   puts "=> #{msg}"
+end
+
+def welcome
+
+  prompt "*** Lets Play Tic-Tac-Toe! ***"
+  prompt "*** The first to win 5 games will become the Ultimate Champion! ***"
+  puts "------------------------------------"
+
+  prompt "Press enter to start playing"
+  puts "------------------------------------"
+
+  gets.chomp
+  system 'clear'
+  prompt "Loading..."
+  sleep(2)
 end
 
 # rubocop:disable Metrics/MethodLength,  Metrics/AbcSize
@@ -58,13 +79,9 @@ def who_goes_first?
     prompt "P: Player, C: Computer or R: Random"
     choice = gets.chomp.downcase
 
-    case choice
-    when 'p' then first_move = PLAYER_MARKER
-    when 'c' then first_move = COMPUTER_MARKER
-    when 'r' then first_move = [PLAYER_MARKER, COMPUTER_MARKER].sample
-    else
-      prompt "Invalid input, please try again!"
-    end
+    prompt "Invalid input, please try again!"
+    first_move = MARKER_MAP[choice]
+
     break if %w(p c r).include?(choice)
   end
   first_move
@@ -86,18 +103,22 @@ def alternate_player(current_player)
   end
 end
 
+def valid_square?(sqr, brd)
+  empty_squares(brd).map(&:to_s).include?(sqr)
+end
+
 def player_turn!(brd)
   square = ''
   loop do
     prompt "Choose a square (#{joinor(empty_squares(brd))}):"
-    square = gets.chomp.to_i
-    break if empty_squares(brd).include?(square)
+    square = gets.chomp
+    break if valid_square?(square, brd)
     prompt "Sorry, that's not a valid choice."
   end
-  brd[square] = PLAYER_MARKER
+  brd[square.to_i] = PLAYER_MARKER
 end
 
-def comp_turn!(brd)
+def make_strategic_move(brd)
   square = nil
 
   WINNING_LINES.each do |line|
@@ -111,6 +132,13 @@ def comp_turn!(brd)
       break if square
     end
   end
+  square
+end
+
+def comp_turn!(brd)
+  make_strategic_move(brd)
+
+  square = make_strategic_move(brd)
 
   if !square && empty_squares(brd).include?(CENTER_SQUARE)
     square = CENTER_SQUARE
@@ -126,8 +154,6 @@ end
 def computer_attack_defense(line, brd, marker)
   if brd.values_at(*line).count(marker) == 2
     brd.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
-  else
-    nil
   end
 end
 
@@ -150,10 +176,10 @@ def detect_winner(brd)
   nil
 end
 
-def keep_score(score, brd)
-  if detect_winner(brd) == 'Player'
+def keep_score(score, winner)
+  if winner == 'Player'
     score['Player'] += 1
-  elsif detect_winner(brd) == 'Computer'
+  elsif winner == 'Computer'
     score['Computer'] += 1
   else
     prompt "No one scores!"
@@ -164,9 +190,9 @@ def display_score(score)
   prompt "Your score #{score['Player']} - Computer score #{score['Computer']}"
 end
 
-def display_winner(brd)
+def display_winner(brd, winner)
   if someone_won?(brd)
-    prompt "#{detect_winner(brd)} won!"
+    prompt "#{winner} won!"
   else
     prompt "It's a tie!"
   end
@@ -185,13 +211,24 @@ def champion(score)
   end
 end
 
+def play_again?
+  answer = ''
+  loop do
+    prompt "Play again? (y or n)"
+    answer = gets.chomp.downcase
+    break if %w(y yes n no).include?(answer)
+    prompt "Invalid input. Select y/yes or n/no."
+  end
+
+  if ['y', 'yes'].include?(answer)
+    true
+  else
+    false
+  end
+end
+
 system 'clear'
-prompt "Welcome to tic-tac-toe!"
-prompt "Press enter to start playing."
-gets.chomp
-system 'clear'
-prompt "Loading..."
-sleep(2)
+welcome
 
 # Main game loop starts
 loop do
@@ -209,18 +246,17 @@ loop do
       break if someone_won?(board) || board_full?(board)
     end
 
+    winner = detect_winner(board)
     display_board(board)
-    keep_score(score, board)
+    keep_score(score, winner)
     display_score(score)
-    display_winner(board)
+    display_winner(board, winner)
     prompt "Press enter to continue."
     gets.chomp
     break if finished?(score)
   end
   champion(score)
-  prompt "Play again? (y or n)"
-  answer = gets.chomp
-  break unless answer.downcase.start_with?('y')
+  break unless play_again?
 end
 
-prompt('Thanks for playing! Good Bye!')
+prompt("Thanks for Playing! Good Bye!")
