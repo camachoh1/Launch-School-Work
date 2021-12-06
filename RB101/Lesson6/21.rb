@@ -1,5 +1,3 @@
-require 'pry'
-
 VALUES = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
 SUITS = ["Hearts", "Spades", "Clubs", "Diamonds"]
 MAX_SCORE = 21
@@ -14,15 +12,8 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
-def welcome_screen
-  puts "------------------------------------"
-  prompt "    *** Lets play 21! ***"
-  prompt "*** Press enter to continue ***"
-  puts "------------------------------------"
-  gets.chomp
-  system 'clear'
-
-  welcome = <<~MSG
+def rules
+  rules = <<~MSG
   Rules of Twenty-One:
   --------------------------------------------
   - The goal of Twenty-One is to try to get as close to 21 as possible, without going over. If you go over 21, it's a "bust" and you lose. 
@@ -30,8 +21,17 @@ def welcome_screen
   - Win 5 games to become the Champion!
   --------------------------------------------
   MSG
-  
-  prompt(welcome)
+  rules
+end
+
+def welcome_screen
+  puts "------------------------------------"
+  prompt "    *** Lets play 21! ***"
+  prompt "*** Press enter to continue ***"
+  puts "------------------------------------"
+  gets.chomp
+  system 'clear'
+  prompt(rules)
   prompt "*** Press enter to start! ***"
   gets.chomp
 end
@@ -72,7 +72,7 @@ def display_hand(hand, player)
     prompt("#{card[0]} of #{card[1]}")
   end
   puts "---------------------------"
-end  
+end
 
 def player_choice
   prompt("would you like to (H)it or (S)tay?")
@@ -101,7 +101,7 @@ def dealer_stay(dealer_total)
   dealer_total >= DEALER_MAX_SCORE
 end
 
-def dealer_hit(dealer_hand,deck)
+def dealer_hit(dealer_hand, deck)
   system 'clear'
   prompt("dealer hits!")
   dealer_hand << deck.pop
@@ -118,7 +118,6 @@ def display_dealer_stay(dealer_total)
 end
 
 def check_winner(player_total, dealer_total)
-
   if player_total > MAX_SCORE
     :player_busted
   elsif dealer_total > MAX_SCORE
@@ -148,11 +147,11 @@ def display_winner(player_total, dealer_total)
   end
 end
 
-def end_of_round_total(player_total,dealer_total)
+def end_of_round_total(player_total, dealer_total)
   display_player_stay(player_total)
   display_dealer_stay(dealer_total)
   display_winner(player_total, dealer_total)
-end 
+end
 
 def play_again?
   choice = ' '
@@ -163,13 +162,13 @@ def play_again?
     prompt "Invalid input. Please try again!"
   end
   if choice == 'n'
-    false
+    !(choice == 'n')
   else
-    choice
+    true
   end
 end
 
-def keep_score(check_winner,score)
+def keep_score(check_winner, score)
   case check_winner
   when :player then score['Player'] += 1
   when :dealer_busted then score['Player'] += 1
@@ -180,9 +179,9 @@ def keep_score(check_winner,score)
   end
 end
 
-def is_finished?(score)
+def finished?(score)
   score['Player'] == CHAMPION_SCORE ||
-  score['Dealer'] == CHAMPION_SCORE
+    score['Dealer'] == CHAMPION_SCORE
 end
 
 def display_score(score)
@@ -201,88 +200,86 @@ def champion(score)
   end
 end
 
-# Main game loop start:
-loop do
-  system 'clear'
-  score = {'Player' => 0, 'Dealer' => 0}
-  welcome_screen
+def game_over(player_total, dealer_total, score)
+  end_of_round_total(player_total, dealer_total)
+  keep_score(check_winner(player_total, dealer_total), score)
+  display_score(score)
+end
+
+# rubocop:disable Metrics/MethodLength,  Metrics/AbcSize
+def main
   loop do
     system 'clear'
-    deck = initialize_deck
-    player_hand = deal_cards(deck)
-    dealer_hand = deal_cards(deck)
-
-    player_total = total(player_hand)
-    dealer_total = total(dealer_hand)
-
-    prompt("Dealer has:")
-    prompt "#{dealer_hand[0][0]} of #{dealer_hand[0][1]} and unknown card"
-
-    display_hand(player_hand, "Player")
-    prompt("your current total is #{player_total}")
-    puts "----------------------------"
-    # Player's turn
+    score = { 'Player' => 0, 'Dealer' => 0 }
+    welcome_screen
     loop do
-      choice = player_choice
+      system 'clear'
+      deck = initialize_deck
+      player_hand = deal_cards(deck)
+      dealer_hand = deal_cards(deck)
 
-      if choice == 'h'
-        system 'clear'
-        player_hit(player_hand, deck)
-        player_total = total(player_hand)
-        prompt("your current total is #{player_total}")
+      player_total = total(player_hand)
+      dealer_total = total(dealer_hand)
+
+      prompt("Dealer has:")
+      prompt "#{dealer_hand[0][0]} of #{dealer_hand[0][1]} and unknown card"
+
+      display_hand(player_hand, "Player")
+      prompt("your current total is #{player_total}")
+      puts "----------------------------"
+
+      # Player's turn
+      loop do
+        choice = player_choice
+
+        if choice == 'h'
+          system 'clear'
+          player_hit(player_hand, deck)
+          player_total = total(player_hand)
+          prompt("your current total is #{player_total}")
+          puts "----------------------------"
+        end
+
+        break if choice == 's' || busted?(player_total)
+      end
+
+      if busted?(player_total)
+        game_over(player_total, dealer_total, score)
+        break if finished?(score)
+        play_again? ? next : return
+      end
+
+      # Dealer turn
+      loop do
+        break if dealer_stay(dealer_total)
+
+        dealer_hit(dealer_hand, deck)
+        dealer_total = total(dealer_hand)
+        prompt("dealer current total is #{dealer_total}")
         puts "----------------------------"
       end
-      
-      break if choice == 's' || busted?(player_total)
-    end
 
-    if busted?(player_total)
-      end_of_round_total(player_total, dealer_total)
-      keep_score(check_winner(player_total,dealer_total), score)
-      display_score(score)
-      if is_finished?(score)
-        break
-      else  
-        play_again? ? next : break
+      if busted?(dealer_total)
+        game_over(player_total, dealer_total, score)
+        break if finished?(score)
+        play_again? ? next : return
       end
-    end
 
-    # Dealer turn
-    loop do
-      
-      break if dealer_stay(dealer_total)
-      
-      dealer_hit(dealer_hand,deck)
-      dealer_total = total(dealer_hand)
-      prompt("dealer current total is #{dealer_total}")
-      puts "----------------------------"
-    end
-
-    if busted?(dealer_total)
-      end_of_round_total(player_total, dealer_total)
-      keep_score(check_winner(player_total,dealer_total),score)
-      display_score(score)
-      if is_finished?(score)
+      system 'clear'
+      game_over(player_total, dealer_total, score)
+      if finished?(score)
         break
-      else  
-        play_again? ? next : break
       end
+      return if play_again? == false
     end
-
     system 'clear'
-    end_of_round_total(player_total, dealer_total)
-    keep_score(check_winner(player_total, dealer_total),score)
-    display_score(score)
-    if is_finished?(score)
-      break
-    end 
-    break unless play_again? == 'y' 
+    if finished?(score)
+      champion(score)
+      return
+    end
   end
-  system 'clear'
-  if is_finished?(score)
-    champion(score)
-    break
-  end  
-end  
+end
+# rubocop:enable Metrics/MethodLength,  Metrics/AbcSize
 
+main
 prompt "Thanks for playing 21, Good Bye!"
